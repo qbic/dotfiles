@@ -1,0 +1,91 @@
+version: "3.8"
+services:
+    transmission:
+        image: lscr.io/linuxserver/transmission:latest
+        restart: always
+        ports:
+                - 9091:9091
+                - 51413:51413
+                - 51413:51413/udp
+        volumes:
+                - ${USERDIR}/config/transmission:/config
+                - ${MEDIADIR}/downloads:/downloads
+                - ${MEDIADIR}/watch:/watch
+        environment:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - TZ=${TZ}
+
+    sonarr:
+        image: lscr.io/linuxserver/sonarr:latest
+        restart: always
+        depends_on:
+                - transmission
+                - jackett
+        ports:
+                - 8989:8989
+        volumes:
+                - ${USERDIR}/config/sonarr:/config
+                - ${MEDIADIR}/downloads:/downloads
+                - ${MEDIADIR}/tv:/tv
+        environment:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - TZ=${TZ}
+
+    radarr:
+        image: lscr.io/linuxserver/radarr:latest
+        restart: always
+        depends_on:
+                - transmission
+                - jackett
+        ports:
+                - 7878:7878
+        volumes:
+                - ${USERDIR}/config/radarr:/config
+                - ${MEDIADIR}/downloads:/downloads
+                - ${MEDIADIR}/movies:/movies
+        environment:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - TZ=${TZ}
+
+    jackett:
+        image: lscr.io/linuxserver/jackett:latest
+        restart: always
+        ports:
+                - 9117:9117
+        volumes:
+                - ${USERDIR}/config/jackett:/config
+        environment:
+                - PUID=${PUID}
+                - PGID=${PGID}
+                - TZ=${TZ}
+
+    bazarr:
+        image: lscr.io/linuxserver/bazarr:latest
+        restart: always
+        ports:
+            - 6767:6767
+        volumes:
+            - ${USERDIR}/config/bazarr:/config
+            - ${MEDIADIR}/movies:/movies
+            - ${MEDIADIR}/tv:/tv
+        environment:
+            - PUID=${PUID}
+            - PGID=${PGID}
+            - TZ=${TZ}
+
+    jellyfin:
+        image: lscr.io/linuxserver/jellyfin:latest
+        restart: always
+        ports:
+            - 8096:8096
+        volumes:
+            - ${USERDIR}/config/jellyfin:/config
+            - ${MEDIADIR}/movies:/movies
+            - ${MEDIADIR}/tv:/tv
+        environment:
+            - PUID=${PUID}
+            - PGID=${PGID}
+            - TZ=${TZ}
